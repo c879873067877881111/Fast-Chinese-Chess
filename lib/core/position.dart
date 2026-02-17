@@ -1,3 +1,4 @@
+/// 棋盤座標（4 列 × 8 行），支援正交/對角方向常數與曼哈頓距離計算
 class Position {
   final int row;
   final int col;

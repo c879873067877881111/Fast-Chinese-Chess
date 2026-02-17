@@ -1,3 +1,5 @@
+// 遊戲主畫面：回合狀態列、紅黑棋子清單（被吃灰掉+未翻開計數）、
+// 棋盤、停止連吃按鈕、遊戲結束橫幅
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';

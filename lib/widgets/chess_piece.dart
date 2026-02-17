@@ -1,3 +1,8 @@
+// 單顆棋子 Widget：四種視覺狀態
+// - 蓋棋（faceDown）：棕色底 + "?"
+// - 翻開（faceUp）：奶油底 + 紅/黑中文名稱
+// - 選中（isSelected）：黃色高亮邊框
+// - 盲吃展示（isBlindReveal）：橙色發光邊框
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import '../core/enums.dart';

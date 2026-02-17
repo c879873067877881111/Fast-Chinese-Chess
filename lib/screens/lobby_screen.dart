@@ -1,3 +1,4 @@
+// 大廳畫面：三種遊戲模式選擇（標準/連吃/車直衝），點擊後進入 GameScreen
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
