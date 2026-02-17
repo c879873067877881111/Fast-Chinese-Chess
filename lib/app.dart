@@ -1,3 +1,4 @@
+// MaterialApp 根 Widget：深色棕色主題、Material 3、首頁為 LobbyScreen
 import 'package:flutter/material.dart';
 import 'screens/lobby_screen.dart';
 

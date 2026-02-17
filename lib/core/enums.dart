@@ -1,3 +1,7 @@
+// 全域列舉定義：遊戲模式、回合狀態機、棋子階級/顏色/狀態
+//
+// PieceRank 的 index 順序即為階級大小（soldier=0 最小，general=6 最大）
+
 /// 遊戲模式
 enum GameMode {
   standard,            // 標準模式：無連吃

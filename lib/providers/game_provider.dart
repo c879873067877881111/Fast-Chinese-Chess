@@ -1,3 +1,5 @@
+// Riverpod 狀態管理：GameStateNotifier（遊戲邏輯代理、盲吃延遲結算）
+// 與 GameModeNotifier（遊戲模式切換）
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/enums.dart';
 import '../core/position.dart';

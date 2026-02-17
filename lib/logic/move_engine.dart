@@ -1,3 +1,5 @@
+// 核心遊戲引擎：處理玩家點擊、翻棋、移動、吃子、盲吃兩階段流程、
+// 連吃狀態管理、回合切換、勝負判定
 import '../core/enums.dart';
 import '../core/position.dart';
 import '../models/game_state.dart';

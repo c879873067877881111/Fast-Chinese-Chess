@@ -1,3 +1,5 @@
+// 8×4 棋盤 Widget：GridView 渲染、合法移動綠色高亮、盲吃目標橙色高亮、
+// 點擊回調轉發至 GameStateNotifier.tap()
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
