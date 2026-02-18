@@ -6,7 +6,27 @@ import 'chain_rule_set.dart';
 
 class RookRushRuleSet extends ChainRuleSet {
   @override
+  bool canMove(Board board, Position from, Position to) {
+    if (!to.isValid) return false;
+    final piece = board.at(from);
+    if (piece == null || !piece.isFaceUp) return false;
+    if (board.at(to) != null) return false;
+    // 車直衝模式：馬只能斜著走
+    if (piece.rank == PieceRank.horse) {
+      return (from.row - to.row).abs() == 1 && (from.col - to.col).abs() == 1;
+    }
+    return from.manhattanTo(to) == 1;
+  }
+
+  @override
   bool canCapture(Board board, Position from, Position to) {
+    // 車直衝模式：馬只能斜吃，不能正交一步吃
+    final piece = board.at(from);
+    if (piece != null && piece.rank == PieceRank.horse) {
+      final isDiagonal = (from.row - to.row).abs() == 1 && (from.col - to.col).abs() == 1;
+      if (!isDiagonal) return false;
+    }
+
     // 先檢查基本規則
     if (super.canCapture(board, from, to)) return true;
 
