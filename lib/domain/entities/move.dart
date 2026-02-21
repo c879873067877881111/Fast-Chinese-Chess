@@ -28,12 +28,18 @@ class Move {
   });
 
   factory Move.fromMap(Map<String, dynamic> data) {
+    final type = MoveType.values.firstWhere((e) => e.name == data['type']);
     final fromMap = data['from'] as Map<String, dynamic>;
-    final toMap = data['to'] as Map<String, dynamic>;
+    final from = Position((fromMap['row'] as num).toInt(), (fromMap['col'] as num).toInt());
+    // flip 時 `to` 欄位可能不存在，fallback 為 from
+    final toRaw = data['to'] as Map<String, dynamic>?;
+    final to = toRaw != null
+        ? Position((toRaw['row'] as num).toInt(), (toRaw['col'] as num).toInt())
+        : from;
     return Move(
-      type: MoveType.values.firstWhere((e) => e.name == data['type']),
-      from: Position((fromMap['row'] as num).toInt(), (fromMap['col'] as num).toInt()),
-      to: Position((toMap['row'] as num).toInt(), (toMap['col'] as num).toInt()),
+      type: type,
+      from: from,
+      to: to,
       playerId: data['playerId'] as String,
       moveIndex: (data['moveIndex'] as num).toInt(),
       timestamp: (data['timestamp'] as Timestamp).toDate(),

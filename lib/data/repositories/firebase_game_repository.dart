@@ -30,9 +30,16 @@ class FirebaseGameRepository implements GameRepository {
 
   @override
   Future<void> resignRoom(String roomId, String playerId) async {
+    // 讀取 room 以確認投降方是 red 還是 black，對手即為 winner
+    final snap = await _db.collection('rooms').doc(roomId).get();
+    if (!snap.exists) return;
+    final data = snap.data()!;
+    final isRed = data['redPlayerId'] == playerId;
+    final winner = isRed ? 'black' : 'red';
+
     await _db.collection('rooms').doc(roomId).update({
       'status': 'finished',
-      'winner': null, // Cloud Function 之後再判定，暫時留 null
+      'winner': winner,
       'updatedAt': FieldValue.serverTimestamp(),
     });
   }
