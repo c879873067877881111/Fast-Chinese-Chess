@@ -228,6 +228,7 @@ class OnlineGameStateNotifier extends Notifier<OnlineGameState> {
     final gs = _baseGameState;
     final room = _currentRoom;
     if (gs == null || room == null) return;
+    if (room.status != RoomStatus.playing) return;
     if (gs.turnState != TurnState.chainCapture) return;
     if (!_isMyTurn(gs)) return;
     _sendMove(Move(
