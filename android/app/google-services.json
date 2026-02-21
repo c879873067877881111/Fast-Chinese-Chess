@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "833291126249",
+    "project_id": "dark-chess-f29b9",
+    "storage_bucket": "dark-chess-f29b9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:833291126249:android:910e3893cf5aef8b4f7778",
+        "android_client_info": {
+          "package_name": "com.example.dark_chess"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0BAa4d-h2QsHXjNH93vR2nhNnHuDCpPc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
