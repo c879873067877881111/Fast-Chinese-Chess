@@ -43,7 +43,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
     return PopScope(
       // 攔截返回鍵：先取消配對再離開
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) => _cancel(),
+      onPopInvokedWithResult: (didPop, result) { _cancel(); },
       child: Scaffold(
         backgroundColor: const Color(0xFF2E1A0E),
         appBar: AppBar(

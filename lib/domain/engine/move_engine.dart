@@ -334,7 +334,16 @@ class MoveEngine {
   GameState _replayCapture(GameState state, Position from, Position to) {
     var board = state.board;
     final target = board.at(to);
-    if (target == null) return state;
+
+    // 資料損毀：目標格為空，仍切換回合避免狀態卡死
+    if (target == null) {
+      return _checkWinCondition(_switchTurn(state.copyWith(
+        selectedPosition: () => null,
+        blindTarget: () => null,
+        chainPiece: () => null,
+        turnState: TurnState.selectPiece,
+      )));
+    }
 
     // 盲吃：目標蓋著，先翻開
     if (target.isFaceDown) {
@@ -343,7 +352,17 @@ class MoveEngine {
 
     final flippedTarget = board.at(to);
     final attacker = board.at(from);
-    if (attacker == null || flippedTarget == null) return state;
+
+    // 資料損毀：翻開後仍無棋，仍切換回合
+    if (attacker == null || flippedTarget == null) {
+      return _checkWinCondition(_switchTurn(state.copyWith(
+        board: board,
+        selectedPosition: () => null,
+        blindTarget: () => null,
+        chainPiece: () => null,
+        turnState: TurnState.selectPiece,
+      )));
+    }
 
     // 盲吃失敗（階級不夠）→ 目標留在原位（已翻開），換回合
     if (!attacker.canCaptureByRank(flippedTarget)) {

@@ -408,20 +408,13 @@ class _OnlineChessBoardWidget extends ConsumerWidget {
 
               final isSelected =
                   state.selectedPosition == pos || state.chainPiece == pos;
-              final isBlindReveal =
-                  state.turnState == TurnState.blindReveal;
-              final isBlindTarget =
-                  isBlindReveal && state.blindTarget == pos;
-              final isBlindAttacker =
-                  isBlindReveal && state.selectedPosition == pos;
               final isLegal = legalMoves.contains(pos);
 
               return GestureDetector(
                 onTap: () => notifier.tap(pos),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: _cellColor(
-                        row, col, isLegal && piece == null, isBlindTarget),
+                    color: _cellColor(row, col, isLegal && piece == null),
                     border: Border.all(
                         color: const Color(0xFF5C2E00), width: 0.5),
                   ),
@@ -430,9 +423,9 @@ class _OnlineChessBoardWidget extends ConsumerWidget {
                       ? ChessPieceWidget(
                           piece: piece,
                           cellSize: cellSize,
-                          isSelected: isSelected || isBlindAttacker,
+                          isSelected: isSelected,
                           isLegalTarget: isLegal,
-                          isBlindReveal: isBlindTarget,
+                          isBlindReveal: false,
                         )
                       : null,
                 ),
@@ -444,9 +437,7 @@ class _OnlineChessBoardWidget extends ConsumerWidget {
     );
   }
 
-  Color _cellColor(
-      int row, int col, bool isLegalEmpty, bool isBlindTarget) {
-    if (isBlindTarget) return const Color(0xFFFFCC80);
+  Color _cellColor(int row, int col, bool isLegalEmpty) {
     if (isLegalEmpty) return const Color(0xFFA5D6A7);
     return (row + col) % 2 == 0
         ? const Color(0xFFDEB887)
