@@ -3,6 +3,7 @@
 import '../../core/enums.dart';
 import '../../core/position.dart';
 import '../entities/game_state.dart';
+import '../entities/move.dart';
 import '../rules/game_rule_set.dart';
 import '../rules/standard_rule_set.dart';
 import '../rules/chain_rule_set.dart';
@@ -284,5 +285,130 @@ class MoveEngine {
 
   bool _isCurrentPlayerPiece(GameState state, PieceColor color) {
     return state.currentTurn == null || state.currentTurn == color;
+  }
+
+  // ── 線上對戰：重播 Firestore 棋步 ───────────────────────────────────────────
+
+  /// 將 Firestore 記錄的 [move] 套用到 [state]，不維護 UI 狀態（無 blindReveal）。
+  /// 用於線上對戰從 boardSeed 重播所有棋步以重建棋盤。
+  GameState applyMove(GameState state, Move move) {
+    switch (move.type) {
+      case MoveType.flip:
+        return _replayFlip(state, move.from);
+      case MoveType.move:
+        return _replayMove(state, move.from, move.to);
+      case MoveType.capture:
+        return _replayCapture(state, move.from, move.to);
+      case MoveType.endChain:
+        return _replayEndChain(state);
+    }
+  }
+
+  GameState _replayFlip(GameState state, Position pos) {
+    final newBoard = state.board.flip(pos);
+    final flippedPiece = newBoard.at(pos);
+
+    // 資料損毀：翻開後無棋子，仍切換回合避免狀態卡死
+    if (flippedPiece == null) {
+      return _checkWinCondition(_switchTurn(state.copyWith(
+        board: newBoard,
+        selectedPosition: () => null,
+        turnState: TurnState.selectPiece,
+      )));
+    }
+
+    final turn = state.currentTurn ?? flippedPiece.color;
+    return _checkWinCondition(_switchTurn(state.copyWith(
+      board: newBoard,
+      currentTurn: () => turn,
+      selectedPosition: () => null,
+      blindTarget: () => null,
+      chainPiece: () => null,
+      turnState: TurnStateMachine.afterFlip(),
+    )));
+  }
+
+  GameState _replayMove(GameState state, Position from, Position to) {
+    final newBoard = state.board.move(from, to);
+    return _checkWinCondition(_switchTurn(state.copyWith(
+      board: newBoard,
+      selectedPosition: () => null,
+      blindTarget: () => null,
+      chainPiece: () => null,
+      turnState: TurnStateMachine.afterMove(),
+    )));
+  }
+
+  /// 重播吃子（含盲吃：目標蓋著時先翻開再判定）
+  GameState _replayCapture(GameState state, Position from, Position to) {
+    var board = state.board;
+    final target = board.at(to);
+
+    // 資料損毀：目標格為空，仍切換回合避免狀態卡死
+    if (target == null) {
+      return _checkWinCondition(_switchTurn(state.copyWith(
+        selectedPosition: () => null,
+        blindTarget: () => null,
+        chainPiece: () => null,
+        turnState: TurnState.selectPiece,
+      )));
+    }
+
+    // 盲吃：目標蓋著，先翻開
+    if (target.isFaceDown) {
+      board = board.flip(to);
+    }
+
+    final flippedTarget = board.at(to);
+    final attacker = board.at(from);
+
+    // 資料損毀：翻開後仍無棋，仍切換回合
+    if (attacker == null || flippedTarget == null) {
+      return _checkWinCondition(_switchTurn(state.copyWith(
+        board: board,
+        selectedPosition: () => null,
+        blindTarget: () => null,
+        chainPiece: () => null,
+        turnState: TurnState.selectPiece,
+      )));
+    }
+
+    // 盲吃失敗（階級不夠）→ 目標留在原位（已翻開），換回合
+    if (!attacker.canCaptureByRank(flippedTarget)) {
+      return _checkWinCondition(_switchTurn(state.copyWith(
+        board: board,
+        selectedPosition: () => null,
+        blindTarget: () => null,
+        chainPiece: () => null,
+        turnState: TurnState.selectPiece,
+      )));
+    }
+
+    // 吃子成功
+    final newBoard = board.capture(from, to);
+    if (ruleSet.supportsChainCapture && ruleSet.hasChainCapture(newBoard, to)) {
+      return _checkWinCondition(state.copyWith(
+        board: newBoard,
+        selectedPosition: () => to,
+        chainPiece: () => to,
+        turnState: TurnStateMachine.afterCapture(hasChain: true),
+      ));
+    }
+
+    return _checkWinCondition(_switchTurn(state.copyWith(
+      board: newBoard,
+      selectedPosition: () => null,
+      blindTarget: () => null,
+      chainPiece: () => null,
+      turnState: TurnStateMachine.afterCapture(hasChain: false),
+    )));
+  }
+
+  GameState _replayEndChain(GameState state) {
+    return _checkWinCondition(_switchTurn(state.copyWith(
+      chainPiece: () => null,
+      selectedPosition: () => null,
+      turnState: TurnState.selectPiece,
+    )));
   }
 }

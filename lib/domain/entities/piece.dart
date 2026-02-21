@@ -62,7 +62,7 @@ class Piece {
     PieceRank.elephant: '象',
     PieceRank.chariot: '車',
     PieceRank.horse: '馬',
-    PieceRank.cannon: '砲',
+    PieceRank.cannon: '包',
     PieceRank.soldier: '卒',
   };
 
