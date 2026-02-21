@@ -5,9 +5,9 @@
 // - 盲吃展示（isBlindReveal）：橙色發光邊框
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
-import '../core/enums.dart';
-import '../core/position.dart';
-import '../models/piece.dart';
+import '../../core/enums.dart';
+import '../../core/position.dart';
+import '../../domain/entities/piece.dart';
 
 class ChessPieceWidget extends StatelessWidget {
   final Piece piece;

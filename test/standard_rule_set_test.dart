@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dark_chess/core/enums.dart';
 import 'package:dark_chess/core/position.dart';
-import 'package:dark_chess/models/board.dart';
-import 'package:dark_chess/models/piece.dart';
-import 'package:dark_chess/rules/standard_rule_set.dart';
+import 'package:dark_chess/domain/entities/board.dart';
+import 'package:dark_chess/domain/entities/piece.dart';
+import 'package:dark_chess/domain/rules/standard_rule_set.dart';
 
 /// 建立空棋盤
 Board _emptyBoard() {

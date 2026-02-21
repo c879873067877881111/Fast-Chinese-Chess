@@ -1,11 +1,11 @@
 // Riverpod 狀態管理：GameStateNotifier（遊戲邏輯代理、盲吃延遲結算）
 // 與 GameModeNotifier（遊戲模式切換）
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/enums.dart';
-import '../core/position.dart';
-import '../logic/move_engine.dart';
-import '../models/board.dart';
-import '../models/game_state.dart';
+import '../../core/enums.dart';
+import '../../core/position.dart';
+import '../../domain/engine/move_engine.dart';
+import '../../domain/entities/board.dart';
+import '../../domain/entities/game_state.dart';
 
 class GameStateNotifier extends Notifier<GameState> {
   late MoveEngine _engine;

@@ -1,7 +1,7 @@
 // 遊戲狀態容器（不可變）：棋盤、回合、選中棋子、連吃/盲吃狀態、勝負
 // 使用 Function() 包裝的 copyWith 模式支援 nullable 欄位更新
-import '../core/enums.dart';
-import '../core/position.dart';
+import '../../core/enums.dart';
+import '../../core/position.dart';
 import 'board.dart';
 
 class GameState {

@@ -1,7 +1,7 @@
 // 規則引擎抽象介面：定義移動、吃子、合法目標、連吃判定
 // 繼承鏈：StandardRuleSet → ChainRuleSet → RookRushRuleSet
-import '../core/position.dart';
-import '../models/board.dart';
+import '../../core/position.dart';
+import '../entities/board.dart';
 
 /// 規則引擎抽象類別
 abstract class GameRuleSet {

@@ -1,6 +1,6 @@
 // MaterialApp 根 Widget：深色棕色主題、Material 3、首頁為 LobbyScreen
 import 'package:flutter/material.dart';
-import 'screens/lobby_screen.dart';
+import 'presentation/screens/lobby_screen.dart';
 
 class DarkChessApp extends StatelessWidget {
   const DarkChessApp({super.key});

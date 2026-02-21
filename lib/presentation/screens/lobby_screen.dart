@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/enums.dart';
+import '../../core/enums.dart';
 import '../providers/game_provider.dart';
 import 'game_screen.dart';
 

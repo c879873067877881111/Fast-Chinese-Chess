@@ -1,5 +1,5 @@
 // 回合狀態轉換：翻棋/移動後→selectPiece、吃子後→chainCapture 或 selectPiece
-import '../core/enums.dart';
+import '../../core/enums.dart';
 
 class TurnStateMachine {
   /// 翻棋後：換人
