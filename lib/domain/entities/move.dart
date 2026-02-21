@@ -8,7 +8,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/position.dart';
 
-enum MoveType { flip, move, capture }
+enum MoveType { flip, move, capture, endChain }
 
 class Move {
   final MoveType type;
