@@ -31,6 +31,9 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
       });
 
       // 2. 查詢是否有人已在等同一個 mode
+      // 注意：此 query 需要 Firestore composite index：
+      //   collection: queue  fields: mode ASC, userId ASC, roomId ASC
+      // 未建 index 時 Firestore 會在 error message 提供建立連結。
       final snapshot = await _db
           .collection('queue')
           .where('mode', isEqualTo: mode.name)
@@ -115,7 +118,8 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
         tx.update(_db.collection('queue').doc(myId), {'roomId': roomId});
       });
       return roomId;
-    } catch (_) {
+    } on FirebaseException catch (_) {
+      // transaction 被搶走或 Firestore 衝突 → 讓呼叫方繼續等待
       return null;
     }
   }

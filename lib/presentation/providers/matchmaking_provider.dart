@@ -49,6 +49,9 @@ class MatchmakingNotifier extends Notifier<MatchmakingState> {
   }
 
   void search(GameMode mode) {
+    _sub?.cancel(); // 防止重複呼叫時舊 stream 繼續跑
+    _sub = null;
+
     final userId = ref.read(authRepositoryProvider).userId;
     if (userId == null) {
       state = const MatchmakingState(
