@@ -144,7 +144,9 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
   }
 
   Future<void> _cancel() async {
-    await ref.read(matchmakingProvider.notifier).cancel();
+    try {
+      await ref.read(matchmakingProvider.notifier).cancel();
+    } catch (_) {}
     if (mounted) Navigator.of(context).pop();
   }
 

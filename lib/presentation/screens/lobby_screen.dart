@@ -23,9 +23,11 @@ class LobbyScreen extends ConsumerWidget {
 
           return Center(
             child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
                   Text(
                     '暗棋',
                     style: TextStyle(
@@ -60,7 +62,8 @@ class LobbyScreen extends ConsumerWidget {
                 ],
               ),
             ),
-          );
+          ),
+        );
         },
       ),
     );
