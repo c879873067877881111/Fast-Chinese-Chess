@@ -20,7 +20,7 @@ enum TurnState {
 /// 棋子階級（數值越大越高）
 enum PieceRank {
   soldier, // 兵/卒 (0)
-  cannon,  // 砲/炮 (1)
+  cannon,  // 炮/包 (1)
   horse,   // 馬/傌 (2)
   chariot, // 車/俥 (3)
   elephant,// 象/相 (4)
