@@ -12,7 +12,7 @@ class Board {
   Board(this.grid);
 
   /// 建立初始棋盤（純隨機，本機單機對戰用）
-  factory Board.initial() => Board.fromSeed(Random().nextInt(1 << 32));
+  factory Board.initial() => Board.fromSeed(Random().nextInt(0x7FFFFFFF));
 
   /// 建立初始棋盤（固定種子，線上對戰雙端保持一致）
   factory Board.fromSeed(int seed) {
