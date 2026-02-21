@@ -1,5 +1,6 @@
 // 4×8 不可變棋盤：翻棋(flip)、移動(move)、吃子(capture)
 // 提供統計方法：capturedCounts（被吃數量）、faceDownCount（未翻開數量）
+import 'dart:math';
 import '../../core/enums.dart';
 import '../../core/position.dart';
 import 'piece.dart';
@@ -10,8 +11,11 @@ class Board {
 
   Board(this.grid);
 
-  /// 建立初始棋盤（所有棋子面朝下，隨機排列）
-  factory Board.initial() {
+  /// 建立初始棋盤（純隨機，本機單機對戰用）
+  factory Board.initial() => Board.fromSeed(Random().nextInt(0x7FFFFFFF));
+
+  /// 建立初始棋盤（固定種子，線上對戰雙端保持一致）
+  factory Board.fromSeed(int seed) {
     final pieces = <Piece>[];
     // 紅黑各 16 子：1將 2士 2象 2車 2馬 2砲 5兵
     for (final color in PieceColor.values) {
@@ -21,13 +25,13 @@ class Board {
             rank: entry.key,
             color: color,
             state: PieceState.faceDown,
-            position: const Position(0, 0), // 暫定，洗牌後設定
+            position: const Position(0, 0),
           ));
         }
       }
     }
 
-    pieces.shuffle();
+    pieces.shuffle(Random(seed));
 
     final grid = List.generate(4, (row) {
       return List.generate(8, (col) {
