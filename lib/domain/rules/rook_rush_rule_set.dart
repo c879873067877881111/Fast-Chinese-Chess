@@ -1,7 +1,7 @@
 // 車直衝規則：繼承 ChainRuleSet，車可沿同行/列直線衝殺（路徑淨空、無視階級）
-import '../core/enums.dart';
-import '../core/position.dart';
-import '../models/board.dart';
+import '../../core/enums.dart';
+import '../../core/position.dart';
+import '../entities/board.dart';
 import 'chain_rule_set.dart';
 
 class RookRushRuleSet extends ChainRuleSet {

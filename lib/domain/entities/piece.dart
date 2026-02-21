@@ -1,8 +1,8 @@
 // 棋子資料模型：階級、顏色、狀態、位置
 // - canCaptureByRank: 階級吃子判定（兵吃將、將不能吃兵、大吃小）
 // - displayName: 紅黑雙方的中文名稱映射（帥/將、仕/士...）
-import '../core/enums.dart';
-import '../core/position.dart';
+import '../../core/enums.dart';
+import '../../core/position.dart';
 
 class Piece {
   final PieceRank rank;

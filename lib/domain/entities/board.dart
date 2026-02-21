@@ -1,7 +1,7 @@
 // 4×8 不可變棋盤：翻棋(flip)、移動(move)、吃子(capture)
 // 提供統計方法：capturedCounts（被吃數量）、faceDownCount（未翻開數量）
-import '../core/enums.dart';
-import '../core/position.dart';
+import '../../core/enums.dart';
+import '../../core/position.dart';
 import 'piece.dart';
 
 class Board {

@@ -2,9 +2,9 @@
 // - 移動：正交鄰接一步到空格
 // - 吃子：正交鄰接 + 階級規則、砲跳吃（隔一子）、馬斜吃（對角鄰接、無視階級）
 // - 盲吃：攻擊未翻開棋子，砲盲吃仍需炮台
-import '../core/enums.dart';
-import '../core/position.dart';
-import '../models/board.dart';
+import '../../core/enums.dart';
+import '../../core/position.dart';
+import '../entities/board.dart';
 import 'game_rule_set.dart';
 
 class StandardRuleSet extends GameRuleSet {

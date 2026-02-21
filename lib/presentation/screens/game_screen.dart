@@ -4,10 +4,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/enums.dart';
-import '../models/board.dart';
-import '../models/game_state.dart';
-import '../models/piece.dart';
+import '../../core/enums.dart';
+import '../../domain/entities/board.dart';
+import '../../domain/entities/game_state.dart';
+import '../../domain/entities/piece.dart';
 import '../providers/game_provider.dart';
 import '../widgets/chess_board.dart';
 
