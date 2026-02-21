@@ -60,7 +60,7 @@ class OnlineGameScreen extends ConsumerWidget {
                 SizedBox(height: 4 * scale),
                 Expanded(
                   child: Center(
-                    child: _OnlineChessBoardWidget(scale: scale),
+                    child: const _OnlineChessBoardWidget(),
                   ),
                 ),
                 SizedBox(height: 4 * scale),
@@ -351,7 +351,7 @@ class OnlineGameScreen extends ConsumerWidget {
         ],
       ),
     ).then((confirmed) {
-      if (confirmed == true) {
+      if (confirmed == true && context.mounted) {
         ref.read(onlineGameProvider.notifier).resign();
       }
     });
@@ -368,9 +368,7 @@ class OnlineGameScreen extends ConsumerWidget {
 // ── 線上棋盤 Widget ─────────────────────────────────────────────────────────────
 
 class _OnlineChessBoardWidget extends ConsumerWidget {
-  const _OnlineChessBoardWidget({required this.scale});
-
-  final double scale;
+  const _OnlineChessBoardWidget();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

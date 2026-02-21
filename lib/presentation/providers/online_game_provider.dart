@@ -5,6 +5,7 @@
 //   - 新棋步透過 applyMove() 增量重播
 //   - tap() / endChain() / resign() 寫入 Firestore（fire-and-forget）
 //   - 本地只維護選棋 UI（_localSelection），不進入 blindReveal 動畫
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/enums.dart';
 import '../../core/position.dart';
@@ -97,6 +98,7 @@ class OnlineGameStateNotifier extends Notifier<OnlineGameState> {
   PieceColor _myColor = PieceColor.red;
   String _playerId = '';
   Room? _currentRoom;
+  String? _currentRoomId;
 
   @override
   OnlineGameState build() {
@@ -116,6 +118,14 @@ class OnlineGameStateNotifier extends Notifier<OnlineGameState> {
             ? PieceColor.red
             : PieceColor.black;
         _engine = MoveEngine.forMode(room.mode);
+
+        // roomId 切換時重置所有局內狀態
+        if (_currentRoomId != roomId) {
+          _currentRoomId = roomId;
+          _baseGameState = null;
+          _appliedMoveCount = 0;
+          _localSelection = null;
+        }
 
         // 首次建立基礎棋盤
         _baseGameState ??=
@@ -218,6 +228,7 @@ class OnlineGameStateNotifier extends Notifier<OnlineGameState> {
     final room = _currentRoom;
     if (gs == null || room == null) return;
     if (gs.turnState != TurnState.chainCapture) return;
+    if (!_isMyTurn(gs)) return;
     _sendMove(Move(
       type: MoveType.endChain,
       from: gs.chainPiece!,
@@ -281,7 +292,11 @@ class OnlineGameStateNotifier extends Notifier<OnlineGameState> {
   void _sendMove(Move move) {
     final room = _currentRoom;
     if (room == null) return;
-    ref.read(gameRepositoryProvider).sendMove(room.id, move);
+    if (_playerId.isEmpty) return;
+    ref
+        .read(gameRepositoryProvider)
+        .sendMove(room.id, move)
+        .catchError((e) => debugPrint('sendMove failed: $e'));
   }
 
   Move _flipMove(Position pos, Room room) => Move(
