@@ -55,11 +55,6 @@ class LobbyScreen extends ConsumerWidget {
                     '線上對戰',
                     style: TextStyle(color: Colors.white38, fontSize: 12 * scale),
                   ),
-                  SizedBox(height: 4 * scale),
-                  Text(
-                    '目前僅支援標準模式',
-                    style: TextStyle(color: Colors.white24, fontSize: 11 * scale),
-                  ),
                   SizedBox(height: 8 * scale),
                   _buildOnlineButton(context, '標準模式（線上）', GameMode.standard, scale, buttonWidth),
                 ],

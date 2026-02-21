@@ -307,7 +307,16 @@ class MoveEngine {
   GameState _replayFlip(GameState state, Position pos) {
     final newBoard = state.board.flip(pos);
     final flippedPiece = newBoard.at(pos);
-    if (flippedPiece == null) return state;
+
+    // 資料損毀：翻開後無棋子，仍切換回合避免狀態卡死
+    if (flippedPiece == null) {
+      return _checkWinCondition(_switchTurn(state.copyWith(
+        board: newBoard,
+        selectedPosition: () => null,
+        turnState: TurnState.selectPiece,
+      )));
+    }
+
     final turn = state.currentTurn ?? flippedPiece.color;
     return _checkWinCondition(_switchTurn(state.copyWith(
       board: newBoard,

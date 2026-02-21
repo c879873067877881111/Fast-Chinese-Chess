@@ -244,6 +244,7 @@ class OnlineGameStateNotifier extends Notifier<OnlineGameState> {
   void resign() {
     final room = _currentRoom;
     if (room == null) return;
+    if (room.status != RoomStatus.playing) return;
     if (_playerId.isEmpty) return;
     ref.read(gameRepositoryProvider).resignRoom(room.id, _playerId);
   }

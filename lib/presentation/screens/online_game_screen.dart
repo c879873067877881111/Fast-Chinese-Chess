@@ -376,9 +376,8 @@ class _OnlineChessBoardWidget extends ConsumerWidget {
     final state = onlineState.gameState;
     final notifier = ref.read(onlineGameProvider.notifier);
 
-    // 不顯示合法移動：非我方回合 或 blindReveal
-    final showLegal =
-        onlineState.isMyTurn && state.turnState != TurnState.blindReveal;
+    // 非我方回合不顯示合法移動
+    final showLegal = onlineState.isMyTurn;
 
     final legalMoves = showLegal
         ? (state.selectedPosition != null
