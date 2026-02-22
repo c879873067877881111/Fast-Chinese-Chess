@@ -21,12 +21,12 @@ class LobbyScreen extends ConsumerWidget {
           final scale = (shortSide / 400).clamp(0.6, 1.8);
           final buttonWidth = (shortSide * 0.65).clamp(200.0, 360.0);
 
-          return Center(
-            child: SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Center(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                   Text(
                     '暗棋',
