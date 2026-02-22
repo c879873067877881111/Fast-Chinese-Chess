@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/enums.dart';
 import '../../data/repositories/firebase_matchmaking_repository.dart';
@@ -53,6 +54,7 @@ class MatchmakingNotifier extends Notifier<MatchmakingState> {
     _sub = null;
 
     final userId = ref.read(authRepositoryProvider).userId;
+    debugPrint('[Matchmaking] search(mode=$mode, userId=$userId)');
     if (userId == null) {
       state = const MatchmakingState(
         status: MatchmakingStatus.error,
@@ -67,26 +69,35 @@ class MatchmakingNotifier extends Notifier<MatchmakingState> {
         .read(matchmakingRepositoryProvider)
         .joinQueue(mode, userId)
         .listen(
-          (roomId) => state = MatchmakingState(
-            status: MatchmakingStatus.found,
-            roomId: roomId,
-          ),
-          onError: (e) => state = MatchmakingState(
-            status: MatchmakingStatus.error,
-            errorMessage: e.toString(),
-          ),
+          (roomId) {
+            debugPrint('[Matchmaking] found roomId=$roomId');
+            state = MatchmakingState(
+              status: MatchmakingStatus.found,
+              roomId: roomId,
+            );
+          },
+          onError: (e) {
+            debugPrint('[Matchmaking] error: $e');
+            state = MatchmakingState(
+              status: MatchmakingStatus.error,
+              errorMessage: e.toString(),
+            );
+          },
         );
   }
 
   Future<void> cancel() async {
+    debugPrint('[Matchmaking] cancel() start');
     await _sub?.cancel();
     _sub = null;
 
     final userId = ref.read(authRepositoryProvider).userId;
     if (userId != null) {
+      debugPrint('[Matchmaking] cancel() → leaveQueue($userId)');
       await ref.read(matchmakingRepositoryProvider).leaveQueue(userId);
     }
 
+    debugPrint('[Matchmaking] cancel() done → state reset');
     state = const MatchmakingState();
   }
 

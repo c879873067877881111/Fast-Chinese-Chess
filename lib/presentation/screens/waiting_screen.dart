@@ -21,6 +21,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      debugPrint('[WaitingScreen] initState → search(${widget.mode})');
       ref.read(matchmakingProvider.notifier).search(widget.mode);
     });
   }
@@ -30,7 +31,8 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
     final matchState = ref.watch(matchmakingProvider);
 
     // 找到對手 → 設定 roomId，換頁
-    ref.listen<MatchmakingState>(matchmakingProvider, (_, next) {
+    ref.listen<MatchmakingState>(matchmakingProvider, (prev, next) {
+      debugPrint('[WaitingScreen] matchmakingState changed: ${prev?.status} → ${next.status}, roomId=${next.roomId}');
       if (!mounted) return;
       if (next.status == MatchmakingStatus.found && next.roomId != null) {
         ref.read(onlineRoomIdProvider.notifier).set(next.roomId!);
@@ -42,8 +44,12 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
 
     return PopScope(
       // 攔截返回鍵：先取消配對再離開
+      // didPop=true 表示 pop 已由程式碼（_cancel）執行，不重複呼叫
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) { _cancel(); },
+      onPopInvokedWithResult: (didPop, result) {
+        debugPrint('[WaitingScreen] onPopInvoked didPop=$didPop mounted=$mounted');
+        if (!didPop) _cancel();
+      },
       child: Scaffold(
         backgroundColor: const Color(0xFF2E1A0E),
         appBar: AppBar(
@@ -143,11 +149,14 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
     );
   }
 
-  Future<void> _cancel() async {
-    try {
-      await ref.read(matchmakingProvider.notifier).cancel();
-    } catch (_) {}
-    if (mounted) Navigator.of(context).pop();
+  void _cancel() {
+    debugPrint('[WaitingScreen] _cancel() called, mounted=$mounted');
+    // 不等待 Firestore 清理，確保立即返回；清理在背景完成
+    ref.read(matchmakingProvider.notifier).cancel().ignore();
+    if (mounted) {
+      debugPrint('[WaitingScreen] _cancel() → Navigator.pop()');
+      Navigator.of(context).pop();
+    }
   }
 
   String _modeName(GameMode mode) => switch (mode) {

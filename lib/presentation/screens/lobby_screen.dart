@@ -80,6 +80,7 @@ class LobbyScreen extends ConsumerWidget {
       width: buttonWidth,
       child: ElevatedButton(
         onPressed: () {
+          debugPrint('[Lobby] online button tapped: $title (mode=$mode)');
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => WaitingScreen(mode: mode)),
           );
@@ -115,6 +116,7 @@ class LobbyScreen extends ConsumerWidget {
       width: buttonWidth,
       child: ElevatedButton(
         onPressed: () {
+          debugPrint('[Lobby] local button tapped: $title (mode=$mode)');
           ref.read(gameModeProvider.notifier).setMode(mode);
           ref.invalidate(gameStateProvider);
           Navigator.of(context).push(
