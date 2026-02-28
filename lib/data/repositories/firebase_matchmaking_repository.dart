@@ -2,10 +2,13 @@ import 'dart:async';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/enums.dart';
+import '../../domain/entities/room.dart';
 import '../../domain/repositories/matchmaking_repository.dart';
 
 class FirebaseMatchmakingRepository implements MatchmakingRepository {
   final _db = FirebaseFirestore.instance;
+
+  // ── 快速配對（現有邏輯不動） ────────────────────────────────────────────────
 
   @override
   Stream<String> joinQueue(GameMode mode, String userId) {
@@ -57,7 +60,8 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
       // 4. 監聽自己的 queue entry，等 roomId 出現
       StreamSubscription? sub;
       sub = myQueueRef.snapshots().listen((snap) {
-        final roomId = snap.data()?['roomId'] as String?;
+        final data = snap.data();
+        final roomId = data?['roomId'] as String?;
         if (roomId != null && !controller.isClosed) {
           controller.add(roomId);
           controller.close();
@@ -93,7 +97,8 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
         final opponentDoc = await tx.get(opponentRef);
 
         // 對手已被其他人搶走，放棄
-        if (!opponentDoc.exists || opponentDoc.data()!['roomId'] != null) {
+        final opponentData = opponentDoc.data();
+        if (!opponentDoc.exists || opponentData == null || opponentData['roomId'] != null) {
           return;
         }
 
@@ -107,6 +112,7 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
           'mode': mode.name,
           'redPlayerId': myId,
           'blackPlayerId': opponentId,
+          'pendingPlayerId': null,
           'boardSeed': seed,
           'currentTurn': null,
           'moves': [],
@@ -127,5 +133,148 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
   @override
   Future<void> leaveQueue(String userId) async {
     await _db.collection('queue').doc(userId).delete();
+  }
+
+  // ── 大廳申請制加房（新增方法） ───────────────────────────────────────────────
+
+  @override
+  Stream<int> watchQueueCount(GameMode mode) {
+    return _db
+        .collection('queue')
+        .where('mode', isEqualTo: mode.name)
+        .where('roomId', isNull: true)
+        .snapshots()
+        .map((snap) => snap.docs.length);
+  }
+
+  @override
+  Future<String> createRoom(GameMode mode, String userId, int boardSeed) async {
+    final now = Timestamp.now();
+    final roomRef = _db.collection('rooms').doc();
+    await roomRef.set({
+      'status': 'waiting',
+      'mode': mode.name,
+      'redPlayerId': userId,
+      'blackPlayerId': null,
+      'pendingPlayerId': null,
+      'boardSeed': boardSeed,
+      'currentTurn': null,
+      'moves': [],
+      'winner': null,
+      'createdAt': now,
+      'updatedAt': now,
+    }).timeout(const Duration(seconds: 10));
+    return roomRef.id;
+  }
+
+  @override
+  Stream<List<Room>> watchOpenRooms() {
+    // 單欄位查詢（不需 composite index），排序在客戶端完成
+    return _db
+        .collection('rooms')
+        .where('status', isEqualTo: 'waiting')
+        .snapshots()
+        .map((snap) {
+          final rooms = snap.docs
+              .map((doc) => Room.fromFirestore(doc.id, doc.data()))
+              .toList();
+          rooms.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return rooms;
+        });
+  }
+
+  @override
+  Future<bool> requestJoin(String roomId, String userId) async {
+    bool success = false;
+    await _db.runTransaction((tx) async {
+      final roomRef = _db.collection('rooms').doc(roomId);
+      final roomDoc = await tx.get(roomRef);
+      if (!roomDoc.exists) return;
+      final data = roomDoc.data();
+      if (data == null) return;
+      // 只有 status=waiting 且 pendingPlayerId==null 才允許申請
+      if (data['status'] != 'waiting') return;
+      if (data['pendingPlayerId'] != null) return;
+      tx.update(roomRef, {
+        'pendingPlayerId': userId,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      success = true;
+    });
+    return success;
+  }
+
+  @override
+  Future<void> approveJoin(String roomId) async {
+    await _db.runTransaction((tx) async {
+      final roomRef = _db.collection('rooms').doc(roomId);
+      final roomDoc = await tx.get(roomRef);
+      if (!roomDoc.exists) return;
+      final data = roomDoc.data();
+      if (data == null) return;
+      // 只有 status=waiting 才允許接受，防止 race condition 把 finished 改回 playing
+      if (data['status'] != 'waiting') return;
+      final pendingId = data['pendingPlayerId'] as String?;
+      if (pendingId == null) return;
+      tx.update(roomRef, {
+        'blackPlayerId': pendingId,
+        'pendingPlayerId': null,
+        'status': 'playing',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
+  @override
+  Future<void> rejectJoin(String roomId) async {
+    // 用 transaction 確保不會誤清後到的新申請
+    await _db.runTransaction((tx) async {
+      final roomRef = _db.collection('rooms').doc(roomId);
+      final roomDoc = await tx.get(roomRef);
+      if (!roomDoc.exists) return;
+      final data = roomDoc.data();
+      if (data == null) return;
+      if (data['status'] != 'waiting') return;
+      tx.update(roomRef, {
+        'pendingPlayerId': null,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
+  @override
+  Future<void> cancelJoinRequest(String roomId, String userId) async {
+    await _db.runTransaction((tx) async {
+      final roomRef = _db.collection('rooms').doc(roomId);
+      final roomDoc = await tx.get(roomRef);
+      if (!roomDoc.exists) return;
+      final data = roomDoc.data();
+      if (data == null) return;
+      // 只有確認自己是 pendingPlayerId 才清除，避免誤清別人的申請
+      if (data['pendingPlayerId'] != userId) return;
+      tx.update(roomRef, {
+        'pendingPlayerId': null,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
+  @override
+  Future<void> closeRoom(String roomId, String userId) async {
+    await _db.runTransaction((tx) async {
+      final roomRef = _db.collection('rooms').doc(roomId);
+      final roomDoc = await tx.get(roomRef);
+      if (!roomDoc.exists) return;
+      final data = roomDoc.data();
+      if (data == null) return;
+      if (data['redPlayerId'] != userId) {
+        throw StateError('只有房主才能關閉房間');
+      }
+      if (data['status'] != 'waiting') return;
+      tx.update(roomRef, {
+        'status': 'finished',
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
   }
 }

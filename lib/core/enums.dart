@@ -28,6 +28,20 @@ enum PieceRank {
   general, // 將/帥 (6)
 }
 
+extension GameModeDisplayName on GameMode {
+  String get displayName => switch (this) {
+        GameMode.standard => '標準模式',
+        GameMode.chainCapture => '連吃模式',
+        GameMode.chainCaptureWithRookRush => '連吃 + 車直衝',
+      };
+
+  String get shortName => switch (this) {
+        GameMode.standard => '標準',
+        GameMode.chainCapture => '連吃',
+        GameMode.chainCaptureWithRookRush => '車直衝',
+      };
+}
+
 /// 棋子顏色
 enum PieceColor {
   red,

@@ -103,7 +103,7 @@ class _OnlineLobbyScreenState extends ConsumerState<OnlineLobbyScreen> {
                   ),
                 ),
                 child: Text(
-                  _modeName(mode),
+                  mode.shortName,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: isSelected ? Colors.white : Colors.white54,
@@ -241,11 +241,15 @@ class _OnlineLobbyScreenState extends ConsumerState<OnlineLobbyScreen> {
           room: room,
           isOwn: isOwn,
           onTap: isOwn
-              ? () => Navigator.of(context).push(
+              ? () async {
+                  await Navigator.of(context).push(
                     MaterialPageRoute(
                         builder: (_) =>
                             HostWaitingScreen(roomId: room.id)),
-                  )
+                  );
+                  if (!context.mounted) return;
+                  ref.read(onlineLobbyProvider.notifier).reset();
+                }
               : () => _applyRoom(context, room),
         );
       },
@@ -290,11 +294,6 @@ class _OnlineLobbyScreenState extends ConsumerState<OnlineLobbyScreen> {
     ref.read(onlineLobbyProvider.notifier).reset();
   }
 
-  String _modeName(GameMode mode) => switch (mode) {
-        GameMode.standard => '標準',
-        GameMode.chainCapture => '連吃',
-        GameMode.chainCaptureWithRookRush => '車直衝',
-      };
 }
 
 // ── 房間卡片 ──────────────────────────────────────────────────────────────────

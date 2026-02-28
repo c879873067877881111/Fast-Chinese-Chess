@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/enums.dart';
 import '../providers/game_provider.dart';
 import 'game_screen.dart';
-import 'waiting_screen.dart';
+import 'online_lobby_screen.dart';
 
 class LobbyScreen extends ConsumerWidget {
   const LobbyScreen({super.key});
@@ -80,9 +80,8 @@ class LobbyScreen extends ConsumerWidget {
       width: buttonWidth,
       child: ElevatedButton(
         onPressed: () {
-          debugPrint('[Lobby] online button tapped: $title (mode=$mode)');
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => WaitingScreen(mode: mode)),
+            MaterialPageRoute(builder: (_) => const OnlineLobbyScreen()),
           );
         },
         style: ElevatedButton.styleFrom(
@@ -116,7 +115,6 @@ class LobbyScreen extends ConsumerWidget {
       width: buttonWidth,
       child: ElevatedButton(
         onPressed: () {
-          debugPrint('[Lobby] local button tapped: $title (mode=$mode)');
           ref.read(gameModeProvider.notifier).setMode(mode);
           ref.invalidate(gameStateProvider);
           Navigator.of(context).push(

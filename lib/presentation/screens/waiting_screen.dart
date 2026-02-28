@@ -98,7 +98,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              _modeName(widget.mode),
+              widget.mode.displayName,
               style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),
           ),
@@ -159,9 +159,4 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
     }
   }
 
-  String _modeName(GameMode mode) => switch (mode) {
-        GameMode.standard => '標準模式',
-        GameMode.chainCapture => '連吃模式',
-        GameMode.chainCaptureWithRookRush => '連吃 + 車直衝',
-      };
 }

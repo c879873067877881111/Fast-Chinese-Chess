@@ -31,7 +31,7 @@ class OnlineGameScreen extends ConsumerWidget {
       child: Scaffold(
         backgroundColor: const Color(0xFF2E1A0E),
         appBar: AppBar(
-          title: Text(_modeName(onlineState.room?.mode)),
+          title: Text(onlineState.room?.mode.displayName ?? '線上對局'),
           backgroundColor: const Color(0xFF5C2E00),
           foregroundColor: Colors.white,
           actions: [
@@ -357,12 +357,6 @@ class OnlineGameScreen extends ConsumerWidget {
     });
   }
 
-  String _modeName(GameMode? mode) => switch (mode) {
-        GameMode.standard => '標準模式',
-        GameMode.chainCapture => '連吃模式',
-        GameMode.chainCaptureWithRookRush => '連吃 + 車直衝',
-        null => '線上對局',
-      };
 }
 
 // ── 線上棋盤 Widget ─────────────────────────────────────────────────────────────
