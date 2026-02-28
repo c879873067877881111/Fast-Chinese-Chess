@@ -60,7 +60,7 @@ class GameScreen extends ConsumerWidget {
                 Padding(
                   padding: EdgeInsets.all(8 * scale),
                   child: Text(
-                    _modeName(state.mode),
+                    state.mode.displayName,
                     style: TextStyle(color: Colors.white54, fontSize: 12 * scale),
                   ),
                 ),
@@ -279,17 +279,6 @@ class GameScreen extends ConsumerWidget {
   String _colorName(PieceColor? color) {
     if (color == null) return '';
     return color == PieceColor.red ? '紅方' : '黑方';
-  }
-
-  String _modeName(GameMode mode) {
-    switch (mode) {
-      case GameMode.standard:
-        return '標準模式';
-      case GameMode.chainCapture:
-        return '連吃模式';
-      case GameMode.chainCaptureWithRookRush:
-        return '連吃 + 車直衝模式';
-    }
   }
 }
 

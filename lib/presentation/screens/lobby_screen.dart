@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/enums.dart';
 import '../providers/game_provider.dart';
 import 'game_screen.dart';
-import 'waiting_screen.dart';
+import 'online_lobby_screen.dart';
 
 class LobbyScreen extends ConsumerWidget {
   const LobbyScreen({super.key});
@@ -21,11 +21,13 @@ class LobbyScreen extends ConsumerWidget {
           final scale = (shortSide / 400).clamp(0.6, 1.8);
           final buttonWidth = (shortSide * 0.65).clamp(200.0, 360.0);
 
-          return Center(
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                   Text(
                     '暗棋',
                     style: TextStyle(
@@ -56,11 +58,12 @@ class LobbyScreen extends ConsumerWidget {
                     style: TextStyle(color: Colors.white38, fontSize: 12 * scale),
                   ),
                   SizedBox(height: 8 * scale),
-                  _buildOnlineButton(context, '標準模式（線上）', GameMode.standard, scale, buttonWidth),
+                  _buildOnlineButton(context, '標準模式（線上）', scale, buttonWidth),
                 ],
               ),
             ),
-          );
+          ),
+        );
         },
       ),
     );
@@ -69,7 +72,6 @@ class LobbyScreen extends ConsumerWidget {
   Widget _buildOnlineButton(
     BuildContext context,
     String title,
-    GameMode mode,
     double scale,
     double buttonWidth,
   ) {
@@ -78,7 +80,7 @@ class LobbyScreen extends ConsumerWidget {
       child: ElevatedButton(
         onPressed: () {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => WaitingScreen(mode: mode)),
+            MaterialPageRoute(builder: (_) => const OnlineLobbyScreen()),
           );
         },
         style: ElevatedButton.styleFrom(

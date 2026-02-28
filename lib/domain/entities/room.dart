@@ -1,16 +1,17 @@
 // 線上對戰房間 entity，對應 Firestore /rooms/{roomId}
 //
 // Firestore schema:
-//   status       : "waiting" | "playing" | "finished"
-//   mode         : "standard" | "chainCapture" | "chainCaptureWithRookRush"
-//   redPlayerId  : string
-//   blackPlayerId: string | null
-//   boardSeed    : int      ← 雙端用同一種子初始化棋盤
-//   currentTurn  : "red" | "black" | null
-//   moves        : List<Map> ← Cloud Function 寫入的棋步歷史
-//   winner       : "red" | "black" | null
-//   createdAt    : timestamp
-//   updatedAt    : timestamp
+//   status          : "waiting" | "playing" | "finished"
+//   mode            : "standard" | "chainCapture" | "chainCaptureWithRookRush"
+//   redPlayerId     : string
+//   blackPlayerId   : string | null
+//   pendingPlayerId : string | null  ← 申請中的玩家 userId（同時只允許一人）
+//   boardSeed       : int      ← 雙端用同一種子初始化棋盤
+//   currentTurn     : "red" | "black" | null
+//   moves           : List<Map> ← Cloud Function 寫入的棋步歷史
+//   winner          : "red" | "black" | null
+//   createdAt       : timestamp
+//   updatedAt       : timestamp
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/enums.dart';
 
@@ -22,6 +23,7 @@ class Room {
   final GameMode mode;
   final String redPlayerId;
   final String? blackPlayerId;
+  final String? pendingPlayerId;
   final int boardSeed;
   final PieceColor? currentTurn;
   final List<Map<String, dynamic>> moves;
@@ -35,6 +37,7 @@ class Room {
     required this.mode,
     required this.redPlayerId,
     this.blackPlayerId,
+    this.pendingPlayerId,
     required this.boardSeed,
     this.currentTurn,
     this.moves = const [],
@@ -50,13 +53,14 @@ class Room {
       mode: _parseMode(data['mode'] as String),
       redPlayerId: data['redPlayerId'] as String,
       blackPlayerId: data['blackPlayerId'] as String?,
+      pendingPlayerId: data['pendingPlayerId'] as String?,
       boardSeed: (data['boardSeed'] as num).toInt(),
       currentTurn: _parseColor(data['currentTurn'] as String?),
       moves: (data['moves'] as List<dynamic>? ?? [])
           .cast<Map<String, dynamic>>(),
       winner: _parseColor(data['winner'] as String?),
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp).toDate(),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
 
@@ -66,6 +70,7 @@ class Room {
       'mode': mode.name,
       'redPlayerId': redPlayerId,
       'blackPlayerId': blackPlayerId,
+      'pendingPlayerId': pendingPlayerId,
       'boardSeed': boardSeed,
       'currentTurn': currentTurn?.name,
       'moves': moves,

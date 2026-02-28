@@ -30,7 +30,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
     final matchState = ref.watch(matchmakingProvider);
 
     // 找到對手 → 設定 roomId，換頁
-    ref.listen<MatchmakingState>(matchmakingProvider, (_, next) {
+    ref.listen<MatchmakingState>(matchmakingProvider, (prev, next) {
       if (!mounted) return;
       if (next.status == MatchmakingStatus.found && next.roomId != null) {
         ref.read(onlineRoomIdProvider.notifier).set(next.roomId!);
@@ -42,8 +42,11 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
 
     return PopScope(
       // 攔截返回鍵：先取消配對再離開
+      // didPop=true 表示 pop 已由程式碼（_cancel）執行，不重複呼叫
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) { _cancel(); },
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) _cancel();
+      },
       child: Scaffold(
         backgroundColor: const Color(0xFF2E1A0E),
         appBar: AppBar(
@@ -92,7 +95,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              _modeName(widget.mode),
+              widget.mode.displayName,
               style: const TextStyle(color: Colors.white70, fontSize: 14),
             ),
           ),
@@ -143,14 +146,8 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
     );
   }
 
-  Future<void> _cancel() async {
-    await ref.read(matchmakingProvider.notifier).cancel();
+  void _cancel() {
+    ref.read(matchmakingProvider.notifier).cancel().ignore();
     if (mounted) Navigator.of(context).pop();
   }
-
-  String _modeName(GameMode mode) => switch (mode) {
-        GameMode.standard => '標準模式',
-        GameMode.chainCapture => '連吃模式',
-        GameMode.chainCaptureWithRookRush => '連吃 + 車直衝',
-      };
 }

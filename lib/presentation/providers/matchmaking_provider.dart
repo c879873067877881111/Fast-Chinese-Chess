@@ -67,14 +67,18 @@ class MatchmakingNotifier extends Notifier<MatchmakingState> {
         .read(matchmakingRepositoryProvider)
         .joinQueue(mode, userId)
         .listen(
-          (roomId) => state = MatchmakingState(
-            status: MatchmakingStatus.found,
-            roomId: roomId,
-          ),
-          onError: (e) => state = MatchmakingState(
-            status: MatchmakingStatus.error,
-            errorMessage: e.toString(),
-          ),
+          (roomId) {
+            state = MatchmakingState(
+              status: MatchmakingStatus.found,
+              roomId: roomId,
+            );
+          },
+          onError: (e) {
+            state = MatchmakingState(
+              status: MatchmakingStatus.error,
+              errorMessage: e.toString(),
+            );
+          },
         );
   }
 
@@ -89,7 +93,6 @@ class MatchmakingNotifier extends Notifier<MatchmakingState> {
 
     state = const MatchmakingState();
   }
-
 }
 
 final matchmakingProvider =
