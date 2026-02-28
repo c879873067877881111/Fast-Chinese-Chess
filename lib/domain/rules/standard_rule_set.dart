@@ -1,6 +1,6 @@
 // 標準暗棋規則（無連吃）
 // - 移動：正交鄰接一步到空格
-// - 吃子：正交鄰接 + 階級規則、砲跳吃（隔一子）、馬斜吃（對角鄰接、無視階級）
+// - 吃子：正交鄰接 + 階級規則、砲跳吃（隔一子）
 // - 盲吃：攻擊未翻開棋子，砲盲吃仍需炮台
 import '../../core/enums.dart';
 import '../../core/position.dart';
@@ -37,10 +37,6 @@ class StandardRuleSet extends GameRuleSet {
       if (attacker.rank == PieceRank.cannon) {
         return _canCannonCapture(board, from, to);
       }
-      // 馬斜吃蓋棋
-      if (attacker.rank == PieceRank.horse && _isDiagonalAdjacent(from, to)) {
-        return true;
-      }
       // 其餘棋子：正交鄰接一步即可盲吃
       return from.manhattanTo(to) == 1;
     }
@@ -50,11 +46,6 @@ class StandardRuleSet extends GameRuleSet {
     // 砲跳吃
     if (attacker.rank == PieceRank.cannon) {
       return _canCannonCapture(board, from, to);
-    }
-
-    // 馬斜吃（對角鄰接，無視階級）
-    if (attacker.rank == PieceRank.horse && _isDiagonalAdjacent(from, to)) {
-      return true;
     }
 
     // 正交鄰接 + 階級規則
@@ -118,7 +109,4 @@ class StandardRuleSet extends GameRuleSet {
     return count == 1; // 恰好一個炮台
   }
 
-  bool _isDiagonalAdjacent(Position a, Position b) {
-    return (a.row - b.row).abs() == 1 && (a.col - b.col).abs() == 1;
-  }
 }
