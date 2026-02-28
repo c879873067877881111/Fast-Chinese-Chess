@@ -29,31 +29,33 @@ class _HostWaitingScreenState extends ConsumerState<HostWaitingScreen> {
     ref.listen<AsyncValue<Room>>(roomProvider(widget.roomId), (prev, next) {
       if (!mounted || _navigated) return;
       next.whenData((room) {
-        // 有申請者 → 彈出確認 dialog
-        if (room.pendingPlayerId != null && !_dialogShowing) {
-          _dialogShowing = true;
-          _showApproveDialog(room.pendingPlayerId!);
-        }
-        // 申請被清除：若 dialog 還開著（對方取消申請），主動關閉
-        if (room.pendingPlayerId == null && _dialogShowing) {
-          _dialogShowing = false;
-          Navigator.of(context).pop();
-        }
-        // 對局開始 → 先關閉懸浮 dialog（如有），再進入遊戲
+        // status 判斷優先，避免一次 snapshot 同時觸發多條分支
         if (room.status == RoomStatus.playing) {
+          // 對局開始 → 先關閉懸浮 dialog（如有），再進入遊戲
           _navigated = true;
           if (_dialogShowing) {
             _dialogShowing = false;
-            Navigator.of(context).pop(); // 關閉懸浮的審核 dialog
+            Navigator.of(context).pop();
           }
           ref.read(onlineRoomIdProvider.notifier).set(widget.roomId);
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const OnlineGameScreen()),
           );
-        }
-        // 房間關閉 → 回到大廳（無論是自己關閉或其他原因）
-        if (room.status == RoomStatus.finished) {
+        } else if (room.status == RoomStatus.finished) {
+          // 房間關閉 → 回到大廳
           _navigated = true;
+          if (_dialogShowing) {
+            _dialogShowing = false;
+            Navigator.of(context).pop();
+          }
+          Navigator.of(context).pop();
+        } else if (room.pendingPlayerId != null && !_dialogShowing) {
+          // 有申請者 → 彈出確認 dialog
+          _dialogShowing = true;
+          _showApproveDialog(room.pendingPlayerId!);
+        } else if (room.pendingPlayerId == null && _dialogShowing) {
+          // 申請被清除（對方取消），主動關閉殘留 dialog
+          _dialogShowing = false;
           Navigator.of(context).pop();
         }
       });

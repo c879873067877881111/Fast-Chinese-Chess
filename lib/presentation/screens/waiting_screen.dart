@@ -21,7 +21,6 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      debugPrint('[WaitingScreen] initState → search(${widget.mode})');
       ref.read(matchmakingProvider.notifier).search(widget.mode);
     });
   }
@@ -32,7 +31,6 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
 
     // 找到對手 → 設定 roomId，換頁
     ref.listen<MatchmakingState>(matchmakingProvider, (prev, next) {
-      debugPrint('[WaitingScreen] matchmakingState changed: ${prev?.status} → ${next.status}, roomId=${next.roomId}');
       if (!mounted) return;
       if (next.status == MatchmakingStatus.found && next.roomId != null) {
         ref.read(onlineRoomIdProvider.notifier).set(next.roomId!);
@@ -47,7 +45,6 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
       // didPop=true 表示 pop 已由程式碼（_cancel）執行，不重複呼叫
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        debugPrint('[WaitingScreen] onPopInvoked didPop=$didPop mounted=$mounted');
         if (!didPop) _cancel();
       },
       child: Scaffold(
@@ -150,13 +147,7 @@ class _WaitingScreenState extends ConsumerState<WaitingScreen> {
   }
 
   void _cancel() {
-    debugPrint('[WaitingScreen] _cancel() called, mounted=$mounted');
-    // 不等待 Firestore 清理，確保立即返回；清理在背景完成
     ref.read(matchmakingProvider.notifier).cancel().ignore();
-    if (mounted) {
-      debugPrint('[WaitingScreen] _cancel() → Navigator.pop()');
-      Navigator.of(context).pop();
-    }
+    if (mounted) Navigator.of(context).pop();
   }
-
 }

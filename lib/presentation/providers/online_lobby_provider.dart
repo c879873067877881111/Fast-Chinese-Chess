@@ -60,7 +60,7 @@ class OnlineLobbyNotifier extends Notifier<OnlineLobbyState> {
     }
     state = const OnlineLobbyState(status: OnlineLobbyStatus.loading);
     try {
-      final seed = Random().nextInt(0x7FFFFFFF);
+      final seed = Random.secure().nextInt(0x7FFFFFFF);
       final roomId = await ref
           .read(matchmakingRepositoryProvider)
           .createRoom(mode, userId, seed);
@@ -102,8 +102,10 @@ class OnlineLobbyNotifier extends Notifier<OnlineLobbyState> {
   }
 
   Future<void> approveJoin(String roomId) async {
+    final userId = _userId;
+    if (userId == null) return;
     try {
-      await ref.read(matchmakingRepositoryProvider).approveJoin(roomId);
+      await ref.read(matchmakingRepositoryProvider).approveJoin(roomId, userId);
     } catch (e) {
       state = OnlineLobbyState(
         status: OnlineLobbyStatus.error,
@@ -113,8 +115,10 @@ class OnlineLobbyNotifier extends Notifier<OnlineLobbyState> {
   }
 
   Future<void> rejectJoin(String roomId) async {
+    final userId = _userId;
+    if (userId == null) return;
     try {
-      await ref.read(matchmakingRepositoryProvider).rejectJoin(roomId);
+      await ref.read(matchmakingRepositoryProvider).rejectJoin(roomId, userId);
     } catch (e) {
       state = OnlineLobbyState(
         status: OnlineLobbyStatus.error,

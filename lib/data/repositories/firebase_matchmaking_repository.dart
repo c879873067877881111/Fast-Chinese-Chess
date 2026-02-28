@@ -175,8 +175,10 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
         .limit(50)
         .snapshots()
         .map((snap) {
+          final cutoff = DateTime.now().subtract(const Duration(minutes: 30));
           final rooms = snap.docs
               .map((doc) => Room.fromFirestore(doc.id, doc.data()))
+              .where((r) => r.createdAt.isAfter(cutoff))
               .toList();
           rooms.sort((a, b) => b.createdAt.compareTo(a.createdAt));
           return rooms;
@@ -192,8 +194,8 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
       if (!roomDoc.exists) return;
       final data = roomDoc.data();
       if (data == null) return;
-      // 只有 status=waiting 且 pendingPlayerId==null 才允許申請
       if (data['status'] != 'waiting') return;
+      if (data['redPlayerId'] == userId) return;
       if (data['pendingPlayerId'] != null) return;
       tx.update(roomRef, {
         'pendingPlayerId': userId,
@@ -205,14 +207,14 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
   }
 
   @override
-  Future<void> approveJoin(String roomId) async {
+  Future<void> approveJoin(String roomId, String userId) async {
     await _db.runTransaction((tx) async {
       final roomRef = _db.collection('rooms').doc(roomId);
       final roomDoc = await tx.get(roomRef);
       if (!roomDoc.exists) return;
       final data = roomDoc.data();
       if (data == null) return;
-      // 只有 status=waiting 才允許接受，防止 race condition 把 finished 改回 playing
+      if (data['redPlayerId'] != userId) return;
       if (data['status'] != 'waiting') return;
       final pendingId = data['pendingPlayerId'] as String?;
       if (pendingId == null) return;
@@ -226,14 +228,14 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
   }
 
   @override
-  Future<void> rejectJoin(String roomId) async {
-    // 用 transaction 確保不會誤清後到的新申請
+  Future<void> rejectJoin(String roomId, String userId) async {
     await _db.runTransaction((tx) async {
       final roomRef = _db.collection('rooms').doc(roomId);
       final roomDoc = await tx.get(roomRef);
       if (!roomDoc.exists) return;
       final data = roomDoc.data();
       if (data == null) return;
+      if (data['redPlayerId'] != userId) return;
       if (data['status'] != 'waiting') return;
       tx.update(roomRef, {
         'pendingPlayerId': null,
