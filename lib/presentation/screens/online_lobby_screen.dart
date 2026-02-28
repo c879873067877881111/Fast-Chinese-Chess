@@ -82,7 +82,7 @@ class _OnlineLobbyScreenState extends ConsumerState<OnlineLobbyScreen> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
       child: Row(
-        children: GameMode.values.map((mode) {
+        children: GameMode.values.where((m) => m != GameMode.chainCapture).map((mode) {
           final isSelected = mode == _selectedMode;
           return Expanded(
             child: GestureDetector(

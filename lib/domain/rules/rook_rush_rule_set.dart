@@ -20,11 +20,16 @@ class RookRushRuleSet extends ChainRuleSet {
 
   @override
   bool canCapture(Board board, Position from, Position to) {
-    // 車直衝模式：馬只能斜吃，不能正交一步吃
     final piece = board.at(from);
+
+    // 車直衝模式：馬斜吃（對角鄰接，無視階級）
     if (piece != null && piece.rank == PieceRank.horse) {
+      if (!to.isValid) return false;
+      final target = board.at(to);
+      if (target == null || target.isCaptured) return false;
+      if (target.isFaceUp && piece.color == target.color) return false;
       final isDiagonal = (from.row - to.row).abs() == 1 && (from.col - to.col).abs() == 1;
-      if (!isDiagonal) return false;
+      return isDiagonal;
     }
 
     // 先檢查基本規則

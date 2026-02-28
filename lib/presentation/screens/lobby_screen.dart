@@ -15,56 +15,64 @@ class LobbyScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFF2E1A0E),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final shortSide = min(constraints.maxWidth, constraints.maxHeight);
-          final scale = (shortSide / 400).clamp(0.6, 1.8);
-          final buttonWidth = (shortSide * 0.65).clamp(200.0, 360.0);
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final shortSide = min(constraints.maxWidth, constraints.maxHeight);
+            final scale = (shortSide / 400).clamp(0.6, 1.8);
+            final buttonWidth = (shortSide * 0.65).clamp(200.0, 360.0);
+            final isLandscape = constraints.maxWidth > constraints.maxHeight;
+            final btnPadding = (isLandscape ? 8.0 : 16.0) * scale;
+            final gap = (isLandscape ? 6.0 : 12.0) * scale;
 
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                  Text(
-                    '暗棋',
-                    style: TextStyle(
-                      color: Colors.amber,
-                      fontSize: 48 * scale,
-                      fontWeight: FontWeight.bold,
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: (isLandscape ? 8 : 0) * scale),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          '暗棋',
+                          style: TextStyle(
+                            color: Colors.amber,
+                            fontSize: (isLandscape ? 28 : 48) * scale,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (!isLandscape) ...[
+                          SizedBox(height: 8 * scale),
+                          Text(
+                            'Dark Chess',
+                            style: TextStyle(color: Colors.white54, fontSize: 16 * scale),
+                          ),
+                        ],
+                        SizedBox(height: (isLandscape ? 8 : 48) * scale),
+                        Text(
+                          '本機對戰',
+                          style: TextStyle(color: Colors.white38, fontSize: 12 * scale),
+                        ),
+                        SizedBox(height: gap),
+                        _buildModeButton(context, ref, '標準模式', '基本暗棋規則', GameMode.standard, scale, buttonWidth, btnPadding),
+                        SizedBox(height: gap),
+                        _buildModeButton(context, ref, '車直衝模式', '連吃 + 車可直線衝殺', GameMode.chainCaptureWithRookRush, scale, buttonWidth, btnPadding),
+                        SizedBox(height: (isLandscape ? 8 : 32) * scale),
+                        Text(
+                          '線上對戰',
+                          style: TextStyle(color: Colors.white38, fontSize: 12 * scale),
+                        ),
+                        SizedBox(height: gap),
+                        _buildOnlineButton(context, '標準模式（線上）', scale, buttonWidth, btnPadding),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 8 * scale),
-                  Text(
-                    'Dark Chess',
-                    style: TextStyle(color: Colors.white54, fontSize: 16 * scale),
-                  ),
-                  SizedBox(height: 48 * scale),
-                  Text(
-                    '本機對戰',
-                    style: TextStyle(color: Colors.white38, fontSize: 12 * scale),
-                  ),
-                  SizedBox(height: 8 * scale),
-                  _buildModeButton(context, ref, '標準模式', '基本暗棋規則', GameMode.standard, scale, buttonWidth),
-                  SizedBox(height: 12 * scale),
-                  _buildModeButton(context, ref, '連吃模式', '吃子後可繼續吃', GameMode.chainCapture, scale, buttonWidth),
-                  SizedBox(height: 12 * scale),
-                  _buildModeButton(context, ref, '車直衝模式', '連吃 + 車可直線衝殺', GameMode.chainCaptureWithRookRush, scale, buttonWidth),
-                  SizedBox(height: 32 * scale),
-                  Text(
-                    '線上對戰',
-                    style: TextStyle(color: Colors.white38, fontSize: 12 * scale),
-                  ),
-                  SizedBox(height: 8 * scale),
-                  _buildOnlineButton(context, '標準模式（線上）', scale, buttonWidth),
-                ],
+                ),
               ),
-            ),
-          ),
-        );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -74,6 +82,7 @@ class LobbyScreen extends ConsumerWidget {
     String title,
     double scale,
     double buttonWidth,
+    double btnPadding,
   ) {
     return SizedBox(
       width: buttonWidth,
@@ -86,7 +95,7 @@ class LobbyScreen extends ConsumerWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF1A3A5C),
           foregroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 16 * scale),
+          padding: EdgeInsets.symmetric(vertical: btnPadding),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         child: Row(
@@ -109,6 +118,7 @@ class LobbyScreen extends ConsumerWidget {
     GameMode mode,
     double scale,
     double buttonWidth,
+    double btnPadding,
   ) {
     return SizedBox(
       width: buttonWidth,
@@ -123,7 +133,7 @@ class LobbyScreen extends ConsumerWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF5C2E00),
           foregroundColor: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 16 * scale),
+          padding: EdgeInsets.symmetric(vertical: btnPadding),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         child: Column(
