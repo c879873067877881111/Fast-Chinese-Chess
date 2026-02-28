@@ -58,7 +58,7 @@ class LobbyScreen extends ConsumerWidget {
                     style: TextStyle(color: Colors.white38, fontSize: 12 * scale),
                   ),
                   SizedBox(height: 8 * scale),
-                  _buildOnlineButton(context, '標準模式（線上）', GameMode.standard, scale, buttonWidth),
+                  _buildOnlineButton(context, '標準模式（線上）', scale, buttonWidth),
                 ],
               ),
             ),
@@ -72,7 +72,6 @@ class LobbyScreen extends ConsumerWidget {
   Widget _buildOnlineButton(
     BuildContext context,
     String title,
-    GameMode mode,
     double scale,
     double buttonWidth,
   ) {

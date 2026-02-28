@@ -356,7 +356,6 @@ class OnlineGameScreen extends ConsumerWidget {
       }
     });
   }
-
 }
 
 // ── 線上棋盤 Widget ─────────────────────────────────────────────────────────────

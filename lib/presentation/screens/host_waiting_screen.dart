@@ -239,5 +239,4 @@ class _HostWaitingScreenState extends ConsumerState<HostWaitingScreen> {
       ),
     );
   }
-
 }

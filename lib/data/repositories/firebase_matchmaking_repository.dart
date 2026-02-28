@@ -149,7 +149,6 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
 
   @override
   Future<String> createRoom(GameMode mode, String userId, int boardSeed) async {
-    final now = Timestamp.now();
     final roomRef = _db.collection('rooms').doc();
     await roomRef.set({
       'status': 'waiting',
@@ -161,8 +160,8 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
       'currentTurn': null,
       'moves': [],
       'winner': null,
-      'createdAt': now,
-      'updatedAt': now,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
     }).timeout(const Duration(seconds: 10));
     return roomRef.id;
   }
@@ -173,6 +172,7 @@ class FirebaseMatchmakingRepository implements MatchmakingRepository {
     return _db
         .collection('rooms')
         .where('status', isEqualTo: 'waiting')
+        .limit(50)
         .snapshots()
         .map((snap) {
           final rooms = snap.docs

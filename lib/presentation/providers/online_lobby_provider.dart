@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/enums.dart';
 import '../../domain/entities/room.dart';
@@ -52,9 +51,7 @@ class OnlineLobbyNotifier extends Notifier<OnlineLobbyState> {
   /// 建立等待中房間，成功回傳 roomId，失敗回傳 null
   Future<String?> createRoom(GameMode mode) async {
     final userId = _userId;
-    debugPrint('[OnlineLobby] createRoom called: userId=$userId, mode=$mode');
     if (userId == null) {
-      debugPrint('[OnlineLobby] createRoom aborted: userId is null (not signed in)');
       state = const OnlineLobbyState(
         status: OnlineLobbyStatus.error,
         errorMessage: '尚未登入',
@@ -64,15 +61,12 @@ class OnlineLobbyNotifier extends Notifier<OnlineLobbyState> {
     state = const OnlineLobbyState(status: OnlineLobbyStatus.loading);
     try {
       final seed = Random().nextInt(0x7FFFFFFF);
-      debugPrint('[OnlineLobby] calling repo.createRoom (seed=$seed)...');
       final roomId = await ref
           .read(matchmakingRepositoryProvider)
           .createRoom(mode, userId, seed);
-      debugPrint('[OnlineLobby] createRoom success: roomId=$roomId');
       state = const OnlineLobbyState();
       return roomId;
     } catch (e) {
-      debugPrint('[OnlineLobby] createRoom error: $e');
       state = OnlineLobbyState(
         status: OnlineLobbyStatus.error,
         errorMessage: e.toString(),
@@ -146,19 +140,13 @@ class OnlineLobbyNotifier extends Notifier<OnlineLobbyState> {
 
   Future<void> closeRoom(String roomId) async {
     final userId = _userId;
-    debugPrint('[OnlineLobby] closeRoom called: roomId=$roomId, userId=$userId');
-    if (userId == null) {
-      debugPrint('[OnlineLobby] closeRoom skipped: userId is null');
-      return;
-    }
+    if (userId == null) return;
     try {
       await ref
           .read(matchmakingRepositoryProvider)
           .closeRoom(roomId, userId);
-      debugPrint('[OnlineLobby] closeRoom success');
       state = const OnlineLobbyState();
     } catch (e) {
-      debugPrint('[OnlineLobby] closeRoom error: $e');
       state = OnlineLobbyState(
         status: OnlineLobbyStatus.error,
         errorMessage: e.toString(),

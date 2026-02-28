@@ -280,7 +280,6 @@ class GameScreen extends ConsumerWidget {
     if (color == null) return '';
     return color == PieceColor.red ? '紅方' : '黑方';
   }
-
 }
 
 @Preview()
