@@ -23,7 +23,7 @@ class RookRushRuleSet extends ChainRuleSet {
     final piece = board.at(from);
 
     // 車直衝模式：馬斜吃（對角鄰接，無視階級）
-    if (piece != null && piece.rank == PieceRank.horse) {
+    if (piece != null && piece.isFaceUp && piece.rank == PieceRank.horse) {
       if (!to.isValid) return false;
       final target = board.at(to);
       if (target == null || target.isCaptured) return false;
