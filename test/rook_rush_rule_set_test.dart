@@ -174,6 +174,16 @@ void main() {
       expect(rules.canCapture(board, const Position(0, 0), const Position(2, 3)), isFalse);
     });
 
+    test('車可直衝盲吃蓋棋', () {
+      final board = _emptyBoard()
+          ._set(const Position(0, 0),
+              _piece(PieceRank.chariot, PieceColor.red, const Position(0, 0)))
+          ._set(const Position(0, 3),
+              _piece(PieceRank.general, PieceColor.black, const Position(0, 3),
+                  state: PieceState.faceDown));
+      expect(rules.canCapture(board, const Position(0, 0), const Position(0, 3)), isTrue);
+    });
+
     test('車不能衝殺同色', () {
       final board = _emptyBoard()
           ._set(const Position(0, 0),
