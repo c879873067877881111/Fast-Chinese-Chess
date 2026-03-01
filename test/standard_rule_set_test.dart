@@ -170,22 +170,33 @@ void main() {
     });
   });
 
-  group('馬斜吃', () {
-    test('對角鄰接可吃（無視階級）', () {
+  group('馬（標準模式：正交一步 + 遵守階級）', () {
+    test('正交鄰接可吃（遵守階級）', () {
+      final board = _emptyBoard()
+          ._setPublic(const Position(1, 3),
+              _piece(PieceRank.horse, PieceColor.red, const Position(1, 3)))
+          ._setPublic(const Position(1, 4),
+              _piece(PieceRank.cannon, PieceColor.black, const Position(1, 4)));
+      // 馬(4) > 砲(5)，可以吃
+      expect(rules.canCapture(board, const Position(1, 3), const Position(1, 4)), isTrue);
+    });
+
+    test('馬不能吃比自己大的', () {
+      final board = _emptyBoard()
+          ._setPublic(const Position(1, 3),
+              _piece(PieceRank.horse, PieceColor.red, const Position(1, 3)))
+          ._setPublic(const Position(1, 4),
+              _piece(PieceRank.chariot, PieceColor.black, const Position(1, 4)));
+      // 馬(4) < 車(3)，不能吃
+      expect(rules.canCapture(board, const Position(1, 3), const Position(1, 4)), isFalse);
+    });
+
+    test('馬不能斜吃（標準模式）', () {
       final board = _emptyBoard()
           ._setPublic(const Position(1, 3),
               _piece(PieceRank.horse, PieceColor.red, const Position(1, 3)))
           ._setPublic(const Position(2, 4),
-              _piece(PieceRank.general, PieceColor.black, const Position(2, 4)));
-      expect(rules.canCapture(board, const Position(1, 3), const Position(2, 4)), isTrue);
-    });
-
-    test('非馬不能斜吃', () {
-      final board = _emptyBoard()
-          ._setPublic(const Position(1, 3),
-              _piece(PieceRank.chariot, PieceColor.red, const Position(1, 3)))
-          ._setPublic(const Position(2, 4),
-              _piece(PieceRank.soldier, PieceColor.black, const Position(2, 4)));
+              _piece(PieceRank.cannon, PieceColor.black, const Position(2, 4)));
       expect(rules.canCapture(board, const Position(1, 3), const Position(2, 4)), isFalse);
     });
   });
