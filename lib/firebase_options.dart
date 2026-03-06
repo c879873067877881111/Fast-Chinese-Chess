@@ -55,7 +55,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyB0BAa4d-h2QsHXjNH93vR2nhNnHuDCpPc',
-    appId: '1:833291126249:android:910e3893cf5aef8b4f7778',
+    appId: '1:833291126249:android:87cae2f0c645ff694f7778',
     messagingSenderId: '833291126249',
     projectId: 'dark-chess-f29b9',
     storageBucket: 'dark-chess-f29b9.firebasestorage.app',
@@ -63,11 +63,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAB4PeJIKC4Mrm5eVsyDTKdprDTI4T_J04',
-    appId: '1:833291126249:ios:cf173977059669e24f7778',
+    appId: '1:833291126249:ios:77e419d061d81c5f4f7778',
     messagingSenderId: '833291126249',
     projectId: 'dark-chess-f29b9',
     storageBucket: 'dark-chess-f29b9.firebasestorage.app',
-    iosBundleId: 'com.example.darkChess',
+    iosBundleId: 'com.c879873067877881111.darkchess',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
