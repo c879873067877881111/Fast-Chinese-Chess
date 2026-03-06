@@ -26,7 +26,6 @@ migrate_working_dir/
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
-ios/Runner/Base.lproj/Main.storyboard
 .dart_tool/
 .flutter-plugins-dependencies
 .pub-cache/
@@ -45,8 +44,11 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Local documentation (not for version control)
-/docs/
+# Android release signing
+android/key.properties
+*.jks
+*.keystore
+
 
 # macOS CocoaPods
 macos/Pods/

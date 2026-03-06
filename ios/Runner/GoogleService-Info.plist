@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.darkChess</string>
+	<string>com.c879873067877881111.darkchess</string>
 	<key>PROJECT_ID</key>
 	<string>dark-chess-f29b9</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:833291126249:ios:cf173977059669e24f7778</string>
+	<string>1:833291126249:ios:77e419d061d81c5f4f7778</string>
 </dict>
 </plist>
